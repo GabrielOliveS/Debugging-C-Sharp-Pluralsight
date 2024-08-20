@@ -64,7 +64,7 @@ namespace Samples.Debugging.Web.WebUI.Pages.Expenses
             if (await TryUpdateModelAsync<Expense>(
                 emptyExpense,
                 "expense",
-                s => s.ID, s => s.DateIncurred, s => s.Description, s => s.Location, s => s.Price, s => s.ExpenseTypeID, s => s.UserID)) //Erro semelhante ao corrigido anteriormente, a ausencia do "s => s.Price" causando problemas na hora de editar o arquivos na database.
+                s => s.ID, s => s.DateIncurred, s => s.Description, s => s.Location, s => s.Price, s => s.ExpenseTypeID, s => s.UserID))
             {
 
                 try

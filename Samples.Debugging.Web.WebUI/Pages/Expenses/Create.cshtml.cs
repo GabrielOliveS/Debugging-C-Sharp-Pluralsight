@@ -55,15 +55,13 @@ namespace Samples.Debugging.Web.WebUI.Pages.Expenses
             if (await TryUpdateModelAsync<Expense>(
                 emptyExpense,
                 "expense",
-                s => s.Description, s => s.DateIncurred, s => s.Location, s => s.Price, s => s.ExpenseTypeID)) //ausência do "s => s.ExpenseTypeID", o valor não estava sendo passado do navegador para aplicação, causando erro.
+                s => s.Description, s => s.DateIncurred, s => s.Location, s => s.Price, s => s.ExpenseTypeID))
             {
 
                 emptyExpense.UserID = 123;
                 bool success = await _expenseRepository.AddExpense(emptyExpense);
-                
-                return RedirectToPage("./Index");
 
-                
+                return RedirectToPage("./Index");
             }
 
             return Page();

@@ -25,7 +25,7 @@ do
 
     if (input != null && input != "")
     {
-        int menuOption = int.Parse(input);
+        int menuOption = int.Parse(input); 
 
         switch (menuOption)
         {

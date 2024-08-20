@@ -170,9 +170,9 @@ namespace Samples.Debugging.ConsoleApp.Expenses
         {
             int numberOfExpenses = expenses.Count();
 
-            double total = 0;
+            double total = 0; //Utilizando watch para copanhar o valor da váriavel durante o método.
 
-            for (int i = 1; i < numberOfExpenses; i++)
+            for (int i = 0; i < numberOfExpenses; i++) //bug encontrado - arrays começam do 0, o contador estava definido para começar do 1.
             {
                 total += expenses[i].Amount;
             }

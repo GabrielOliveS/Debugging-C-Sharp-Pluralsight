@@ -55,7 +55,7 @@ namespace Samples.Debugging.Web.WebUI.Repositories
             }
             if (priceEnd != 0)
             {
-                expenses = expenses.Where(e => e.Price < priceEnd);
+                expenses = expenses.Where(e => e.Price <= priceEnd); //Também estava faltando, quando cometemos um erro uma vez possivelmente foi cometido novamento no código.
             }
 
             return await expenses.ToListAsync();
@@ -66,7 +66,7 @@ namespace Samples.Debugging.Web.WebUI.Repositories
             return await _projectContext.Expenses
                 .Include(e => e.ExpenseType)
                 .Where(e => e.UserID == userId)
-                .Where(e => (e.DateIncurred >= dateStart) && (e.DateIncurred < dateEnd))
+                .Where(e => (e.DateIncurred >= dateStart) && (e.DateIncurred <= dateEnd)) //Estava falando o sinal de =, deixando de ler o ultimo dia do mês.
                 .OrderBy(e => e.DateIncurred)
                 .ToListAsync();
         }

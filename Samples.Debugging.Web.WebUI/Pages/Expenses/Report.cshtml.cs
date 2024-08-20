@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Samples.Debugging.Web.WebUI.Models;
 using Samples.Debugging.Web.WebUI.Repositories;
+using Samples.Debugging.Web.WebUI.RulesEngine;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 
@@ -10,6 +11,8 @@ namespace Samples.Debugging.Web.WebUI.Pages.Expenses
 {
     public class ReportModel : PageModel
     {
+        #region Variables and Properties
+
         int userId = 123;
 
         // repositories for accessing data
@@ -36,6 +39,10 @@ namespace Samples.Debugging.Web.WebUI.Pages.Expenses
         [DataType(DataType.Currency)]
         public double ExpenseTotal { get; set; }
 
+        #endregion
+
+        #region Constructor
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -45,7 +52,10 @@ namespace Samples.Debugging.Web.WebUI.Pages.Expenses
         {
             _expenseRepository = expenseRepository;
             _expenseTypeRepository = expenseTypeRepository;
+
         }
+
+        #endregion
 
         /// <summary>
         /// Method that's called when page loads and when Filter button is pressed
@@ -87,16 +97,11 @@ namespace Samples.Debugging.Web.WebUI.Pages.Expenses
         private void BuildSummaries()
         {
 
-            // query the list of Expenses to group by expense type, sum of expenses and count of each expense type instances
-            var query = Expenses.GroupBy(
-                x => x.ExpenseType.ID,
-                x => x.Price,
-                (expenseTypeId, prices) => new { ExpenseTypeID = expenseTypeId, ExpenseTypeTotal = prices.Sum(), ExpenseCount = prices.Count() });
-
-            var queryTotals = query.ToList();
-
             // get list of Expense Type Categories from repository 
             var Categories = _expenseTypeRepository.GetExpenseTypeCategories();
+
+            // Class to implement business rules pattern
+            PriceAdjustmentRulesEngine rulesEngine = new PriceAdjustmentRulesEngine();
 
             // iterate through categories and build data model for binding to the View
             foreach(var category in Categories)
@@ -118,27 +123,24 @@ namespace Samples.Debugging.Web.WebUI.Pages.Expenses
                     var etSummary = new ExpenseTypeSummary();
                     etSummary.ExpenseTypeID = expenseType.ID;
                     etSummary.ExpenseTypeName = expenseType.Name;
-                    
-                    // query the list of summaries created earlier in the method (from the expenses for the month)
-                    var queryTotalInstance = queryTotals.Where(x => x.ExpenseTypeID == expenseType.ID).FirstOrDefault();
 
-                    // if expense is found, add it to the total
-                    if (queryTotalInstance != null)
+                    var expensesForTypeQuery = Expenses.Where(x => x.ExpenseTypeID == expenseType.ID);
+                    var expensesForType = expensesForTypeQuery.ToList();
+
+                    foreach (Expense e in expensesForType)
                     {
-                        etSummary.ExpensesCount = queryTotalInstance.ExpenseCount;
-                        etSummary.ExpensesTotal = queryTotalInstance.ExpenseTypeTotal;
+                        etSummary.ExpensesCount += 1;
 
-                        // add to global Total
-                        ExpenseTotal += queryTotalInstance.ExpenseTypeTotal;
+                        // adjust the price according to business rules
+                        double expensePrice = rulesEngine.CalculateAdjustedPrice(e);
+
+                        etSummary.ExpensesTotal += expensePrice;
 
                     }
-                    else
-                    {
-                        etSummary.ExpensesCount = 0;
-                        etSummary.ExpensesTotal = 0;
-                    }
 
-                    expenseSummary.Summaries.Add(etSummary);
+                    ExpenseTotal += etSummary.ExpensesTotal;
+
+                     expenseSummary.Summaries.Add(etSummary);
 
                 } // end loop for expense types
 

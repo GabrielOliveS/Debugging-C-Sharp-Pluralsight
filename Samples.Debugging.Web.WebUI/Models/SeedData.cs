@@ -531,6 +531,15 @@ namespace Samples.Debugging.Web.WebUI.Models
                     context.SaveChanges();
 
                 }
+
+                // update the sample record for the IsLower() bug...
+                var sampleExpAdjustment = context.Expenses.Where(e => e.Description == sampleDescription).Where(e => e.Location == sampleLocation)
+                    .Where(e => e.Price == samplePrice).FirstOrDefault();
+                if (sampleExpAdjustment != null)
+                {
+                    sampleExpAdjustment.Description = "lunch";
+                    context.SaveChanges();
+                }
             }
         }
     }

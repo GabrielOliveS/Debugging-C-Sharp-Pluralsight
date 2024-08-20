@@ -127,7 +127,7 @@ namespace Samples.Debugging.Web.WebUI.Pages.Expenses
                     var expensesForTypeQuery = Expenses.Where(x => x.ExpenseTypeID == expenseType.ID);
                     var expensesForType = expensesForTypeQuery.ToList();
 
-                    foreach (Expense e in expensesForType)
+                    foreach (Expense e in expensesForType) //colocar um breakpoint.
                     {
                         etSummary.ExpensesCount += 1;
 

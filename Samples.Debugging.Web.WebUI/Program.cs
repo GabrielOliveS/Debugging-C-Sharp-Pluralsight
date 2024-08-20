@@ -33,6 +33,8 @@ using (var scope = app.Services.CreateScope())
     SeedData.Initialize(services);
 }
 
+//CustomDebugConfig.ConfigureTraceListeners();
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {

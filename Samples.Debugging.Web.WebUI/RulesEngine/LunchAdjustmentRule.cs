@@ -7,7 +7,7 @@ namespace Samples.Debugging.Web.WebUI.RulesEngine
         public bool IsApplicable(Expense ex)
         {
             if(ex.ExpenseType.Name.Contains("Meals & Entertainment") && 
-                ex.Description.Contains("Lunch"))
+                ex.Description.ToLower().Contains("lunch"))
             {
                 return true;
             }
